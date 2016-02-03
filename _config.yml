@@ -11,7 +11,11 @@ language: zh-Hans
 timezone:
 avatar: /images/head.jpg
 
+##多说
 duoshuo_shortname: emou
+
+#百度统计
+baidu_analytics: 141aad170f212f1958d79f3aa51775e6
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
