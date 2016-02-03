@@ -72,3 +72,5 @@ theme: next
 ## Docs: http://hexo.io/docs/deployment.html
 deploy:
   type: git
+  repository: https://github.com/wangdao/wangdao.github.io.git
+  branch: master
