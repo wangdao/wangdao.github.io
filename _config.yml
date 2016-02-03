@@ -14,12 +14,15 @@ avatar: /images/head.jpg
 ##多说
 duoshuo_shortname: emou
 
+# 多说分享服务
+duoshuo_share: true
+
 #百度统计
 baidu_analytics: 141aad170f212f1958d79f3aa51775e6
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
-url: http://yoursite.com
+url: http://emou.me
 root: /
 permalink: :year/:month/:day/:title/
 permalink_defaults:
