@@ -9,7 +9,7 @@ description: 瞎写点，乱画点
 author: WangDao
 language: zh-Hans
 timezone:
-avatar: /images/head.jpg
+avatar: /images/head.png
 
 ##多说
 duoshuo_shortname: emou
@@ -74,6 +74,20 @@ pagination_dir: page
 ## Plugins: http://hexo.io/plugins/
 ## Themes: http://hexo.io/themes/
 theme: next
+
+# Social links
+social:
+  github: https://github.com/wangdao
+  zhihu: https://www.zhihu.com/people/wang-dao-68
+
+#站点建立时间
+since: 2016
+
+feed:
+  type: atom
+  path: atom.xml
+  limit: 20
+  hub:
 
 # Deployment
 ## Docs: http://hexo.io/docs/deployment.html
