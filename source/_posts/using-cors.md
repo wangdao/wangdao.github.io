@@ -5,9 +5,8 @@ tags: [CORS, HTTP]
 categories: 翻译
 ---
 ## 引言
-　　APIs are the threads that let you stitch together a rich web experience. But this experience has a hard time translating to the browser, where the options for cross-domain requests are limited to techniques like JSON-P (which has limited use due to security concerns) or setting up a custom proxy (which can be a pain to set up and maintain).
-
-
+　　API的出现增强了富web应用开发的体验。曾经想通过跨域请求api非常困难可以使用json-p这样的技术（有安全限制）或者自己搭建搭服务器。
+　　
 　　跨域资源共享（CORS）是一种W3C的规范，允许浏览器进行跨域通信。通过设置XMLHttpRequest对象，CORS允许开发者像发起同域请求那样发起跨域请求。
 
 　　想象下，网站bob.com想要访问alice.com网站上的一些数据。这种请求是被同源策略所禁止的。然而，使用CORS，alice.com 增加些特殊响应头可以允许来自bob.com的请求。
@@ -199,46 +198,48 @@ CORS流程图
 ### 简单请求
 
 　　我们先看一个简单请求。下面是JavaScript代码，紧随其后的是浏览器发出的请求，粗体字表示CORS请求所需的header。
-　　JavaScript:
-```
+JavaScript:
+<pre><code>
 var url = 'http://api.alice.com/cors';
 var xhr = createCORSRequest('GET', url);
 xhr.send();
-```
-　　HTTP请求:
-```
+</code></pre>
+HTTP请求:
+<pre><code>
 GET /cors HTTP/1.1
-**Origin**: http://api.bob.com
+<b>Origin</b>: http://api.bob.com
 Host: api.alice.com
 Accept-Language: en-US
 Connection: keep-alive
 User-Agent: Mozilla/5.0...
-```
+</code></pre>
 
 　　CORS请求总是包含一个**Origin**请求头，它由浏览器添加。该值包含协议名、地址和一个可选的端口。例如：http://api.alice.com.
 　　有**Origin**请求头的请求并不一定是跨域请求。不仅跨域请求需要Origin请求头，一些同域请求也可能需要有该请求头。例如，Firefox在同域请求中不添加Origin请求头，但是Chrome和Safari在POST/PUT/DELETE同域请求中包含Origin请求头。下面是个栗子。
 　　HTTP请求
-```
+<pre><code>
 POST /cors HTTP/1.1
-**Origin** : http://api.bob.com
-**Host**: api.bob.com
-```
+<b>Origin</b> : http://api.bob.com
+<b>Host</b>: api.bob.com
+</code></pre>
+
 　　无论请求中是否有CORS所需的请求头，服务器都会响应。但是如果Origin中的域名不在服务器的允许列表中，服务器将返回错误信息。
 　　下面是有效的响应，CORS所需headers用粗体表示。
 　　HTTP 响应：
-```
-**Access-Control-Allow-Origin**: http://api.bob.com
-**Access-Control-Allow-Credentials**: true
-**Access-Control-Expose-Headers**: FooBar
+<pre><code>
+<b>Access-Control-Allow-Origin</b>: http://api.bob.com
+<b>Access-Control-Allow-Credentials</b>: true
+<b>Access-Control-Expose-Headers</b>: FooBar
 Content-Type: text/html; charset=utf-8
 
-```
+</code></pre>
+
 　　在响应中，和CORS相关项目都是以"Access-Control-"为前缀，具体含义如下：
-* Access-Control-Allow-Origin (必含)-不可省略，否则CORS请求失败。该项表示服务器响应指定的域的CORS请求。值为 “\*”时响应任何域的CORS请求。
+ + Access-Control-Allow-Origin (必含)-不可省略，否则CORS请求失败。该项表示服务器响应指定的域的CORS请求。值为 “\*”时响应任何域的CORS请求。
 
-* Access-Control-Allow-Credentials（可选）该项表示请求中是否包含Cookie信息，默认情况，请求中不包含Cookie信息。只有一个可选值true（必须小写）。如果不包含Cookie信息，请略去该项而不是设置其值为false。这一项与XmlHttpRequest2对象当中的withCredentials属性应保持一致，即withCredentials为true时该项也为true；withCredentials为false时，省略该项不写。反之则导致请求失败。除非你确实需要CORS请求中包含Cookie信息，否则不要设置该项。
+ + Access-Control-Allow-Credentials（可选）该项表示请求中是否包含Cookie信息，默认情况，请求中不包含Cookie信息。只有一个可选值true（必须小写）。如果不包含Cookie信息，请略去该项而不是设置其值为false。这一项与XmlHttpRequest2对象当中的withCredentials属性应保持一致，即withCredentials为true时该项也为true；withCredentials为false时，省略该项不写。反之则导致请求失败。除非你确实需要CORS请求中包含Cookie信息，否则不要设置该项。
 
-* Access-Control-Expose-Headers（可选）- XMLHttpRequest2 对象的getResponseHeader()方法返回相应头的信息。在CORS请求中，该方法只能获得一些简单信息。能获得的信息如下：
+ * Access-Control-Expose-Headers（可选）- XMLHttpRequest2 对象的getResponseHeader()方法返回相应头的信息。在CORS请求中，该方法只能获得一些简单信息。能获得的信息如下：
 
     * Cache-Control
     * Content-Language
@@ -247,31 +248,34 @@ Content-Type: text/html; charset=utf-8
     * Last-Modified
     * Pragma
 
-如果你希望客户端能获得到其他header信息，你必须设置Access-Control-Expose-Headers。其值为其他相应头名字，多个值之间用逗号隔开。
+　　如果你希望客户端能获得到其他header信息，你必须设置Access-Control-Expose-Headers。其值为其他相应头名字，多个值之间用逗号隔开。
+
+
 ### 复杂请求
+
 　　到目前我们只介绍了简单请求，但是如果我们想做更多的操作怎么办？比如你需要发送PUT、DELTET等HTTP动作，或者发送Content-Type:application/json的内容。这时就需要我所说的复杂请求了。
 　　复杂请求表面上看起来和简单请求使用上差不多，但实际上浏览器发送了不止一个请求。其中最先发送的是一种“预请求”，此时作为服务端，也需要返回“预回应”作为响应。预请求实际上是对服务端的一种权限请求，只有当预请求成功返回，实际请求才开始执行。
 
 JavaScript：
-```
+<pre><code>
 var url = 'http://api.alice.com/cors';
 var xhr = createCORSRequest('PUT', url);
 xhr.setRequestHeader(
     'X-Custom-Header', 'value');
 xhr.send();
-```
+</code></pre>
 
 预请求：
-```
+<pre><code>
 OPTIONS /cors HTTP/1.1
-Origin: http://api.bob.com
-Access-Control-Request-Method: PUT
-Access-Control-Request-Headers: X-Custom-Header
+<b>Origin</b>: http://api.bob.com
+<b>Access-Control-Request-Method</b>: PUT
+<b>Access-Control-Request-Headers</b>: X-Custom-Header
 Host: api.alice.com
 Accept-Language: en-US
 Connection: keep-alive
 User-Agent: Mozilla/5.0...
-```
+</code></pre>
 
 　　类似简单请求，预请求也包含CORS需要的请求头。预请求用HTTP OPTIONS方法发送请求（确保你的服务器响应该方法的请求）。它也包含一些额外的请求头：
 * Access-Control-Request-Method - 实际的HTTP请求方法，即使简单请求也会有该请求头。
@@ -281,24 +285,24 @@ User-Agent: Mozilla/5.0...
 　　预请求用来验证服务器是否允许执行实际的请求。服务器校验上面两个请求头，验证请求方法和请求头是有效和可处理的。如果允许则服务器应返回如下响应：
 
 预请求：
-```
+<pre><code>
 OPTIONS /cors HTTP/1.1
-Origin: http://api.bob.com
-Access-Control-Request-Method: PUT
-Access-Control-Request-Headers: X-Custom-Header
+<b>Origin</b>: http://api.bob.com
+<b>Access-Control-Request-Method</b>: PUT
+<b>Access-Control-Request-Headers</b>: X-Custom-Header
 Host: api.alice.com
 Accept-Language: en-US
 Connection: keep-alive
 User-Agent: Mozilla/5.0...
-```
+</code></pre>
 
 预响应
-```
-Access-Control-Allow-Origin: http://api.bob.com
-Access-Control-Allow-Methods: GET, POST, PUT
-Access-Control-Allow-Headers: X-Custom-Header
+<pre><code>
+<b>Access-Control-Allow-Origin</b>: http://api.bob.com
+<b>Access-Control-Allow-Methods</b>: GET, POST, PUT
+<b>Access-Control-Allow-Headers</b>: X-Custom-Header
 Content-Type: text/html; charset=utf-8
-```
+</code></pre>
 
 Access-Control-Allow-Origin（必含） - 类似简单请求的响应，预响应也应该包含该响应头。
 
@@ -313,35 +317,35 @@ Access-Control-Max-Age (可选) - 预检对服务器带来很大压力，因为�
 一旦预检成功，浏览器将发起实际请求，看起来和简单请求一样。响应也类似：
 
 实际请求:
-```
+<pre><code>
 PUT /cors HTTP/1.1
-Origin: http://api.bob.com
+<b>Origin</b>: http://api.bob.com
 Host: api.alice.com
-X-Custom-Header: value
+<b>X-Custom-Header</b>: value
 Accept-Language: en-US
 Connection: keep-alive
 User-Agent: Mozilla/5.0...
-```
+</code></pre>
 
 实际响应:
-```
-Access-Control-Allow-Origin: http://api.bob.com
+<pre><code>
+<b>Access-Control-Allow-Origin</b>: http://api.bob.com
 Content-Type: text/html; charset=utf-8
-```
+</code></pre>
 
 使服务器拒绝CORS请求，可以仅仅返回一个不包含任何CORS header的响应。预检失败服务器也应拒绝该次请求。由于响应里没有CORS特定的header，浏览器认为请求失败，不会发起实际请求:
 
 预检请求：
-```
-OPTIONS /cors HTTP/1.1
-Origin: http://api.bob.com
-Access-Control-Request-Method: PUT
-Access-Control-Request-Headers: X-Custom-Header
+<pre><code>
+OPTIONS< /cors HTTP/1.1
+<b>Origin</b>: http://api.bob.com
+<b>Access-Control-Request-Method</b>: PUT
+<b>Access-Control-Request-Headers</b>: X-Custom-Header
 Host: api.alice.com
 Accept-Language: en-US
 Connection: keep-alive
 User-Agent: Mozilla/5.0...
-```
+</code></pre>
 
 预检请求响应
 ```
