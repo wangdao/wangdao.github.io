@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://emou.me/"/>
-  <updated>2016-02-27T02:56:33.113Z</updated>
+  <updated>2016-02-27T15:30:52.288Z</updated>
   <id>http://emou.me/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://emou.me/2016/02/11/using-cors/"/>
     <id>http://emou.me/2016/02/11/using-cors/</id>
     <published>2016-02-11T08:05:55.000Z</published>
-    <updated>2016-02-27T02:56:33.113Z</updated>
+    <updated>2016-02-27T15:30:52.288Z</updated>
     
     <content type="html">&lt;h2 id=&quot;u5F15_u8A00&quot;&gt;&lt;a href=&quot;#u5F15_u8A00&quot; class=&quot;headerlink&quot; title=&quot;引言&quot;&gt;&lt;/a&gt;引言&lt;/h2&gt;&lt;p&gt;　　API的出现增强了富web应用开发的体验。曾经想通过跨域请求api非常困难可以使用json-p这样的技术（有安全限制）或者自己搭建搭服务器。&lt;br&gt;　　&lt;br&gt;　　跨域资源共享（CORS）是一种W3C的规范，允许浏览器进行跨域通信。通过设置XMLHttpRequest对象，CORS允许开发者像发起同域请求那样发起跨域请求。&lt;/p&gt;
 &lt;p&gt;　　想象下，网站bob.com想要访问alice.com网站上的一些数据。这种请求是被同源策略所禁止的。然而，使用CORS，alice.com 增加些特殊响应头可以允许来自bob.com的请求。&lt;/p&gt;
@@ -174,7 +174,7 @@ xhr.withCredentials = true;
 &lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;　　简单请求的特征就是这样，可以由浏览器完成请求无需CORS。比如，JSON-P可以发出跨域GET请求。Or HTML could be used to do a form POST.&lt;/p&gt;
-&lt;p&gt;　　任何一个不满足上述条件的请求都是复杂请求，复杂请求需要额外的预请求（preflight request），下面我们将介绍。&lt;/p&gt;
+&lt;p&gt;　　任何一个不满足上述条件的请求都是复杂请求，复杂请求需要额外的预检请求（preflight request），下面我们将介绍。&lt;/p&gt;
 &lt;h3 id=&quot;u7B80_u5355_u8BF7_u6C42&quot;&gt;&lt;a href=&quot;#u7B80_u5355_u8BF7_u6C42&quot; class=&quot;headerlink&quot; title=&quot;简单请求&quot;&gt;&lt;/a&gt;简单请求&lt;/h3&gt;&lt;p&gt;　　我们先看一个简单请求。下面是JavaScript代码，紧随其后的是浏览器发出的请求，粗体字表示CORS请求所需的header。&lt;br&gt;JavaScript:&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;
 var url = &#39;http://api.alice.com/cors&#39;;
@@ -227,7 +227,7 @@ Content-Type: text/html; charset=utf-8
 &lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;　　如果你希望客户端能获得到其他header信息，你必须设置Access-Control-Expose-Headers。其值为其他相应头名字，多个值之间用逗号隔开。&lt;/p&gt;
-&lt;h3 id=&quot;u590D_u6742_u8BF7_u6C42&quot;&gt;&lt;a href=&quot;#u590D_u6742_u8BF7_u6C42&quot; class=&quot;headerlink&quot; title=&quot;复杂请求&quot;&gt;&lt;/a&gt;复杂请求&lt;/h3&gt;&lt;p&gt;　　到目前我们只介绍了简单请求，但是如果我们想做更多的操作怎么办？比如你需要发送PUT、DELTET等HTTP动作，或者发送Content-Type:application/json的内容。这时就需要我所说的复杂请求了。&lt;br&gt;　　复杂请求表面上看起来和简单请求使用上差不多，但实际上浏览器发送了不止一个请求。其中最先发送的是一种“预请求”，此时作为服务端，也需要返回“预回应”作为响应。预请求实际上是对服务端的一种权限请求，只有当预请求成功返回，实际请求才开始执行。&lt;/p&gt;
+&lt;h3 id=&quot;u590D_u6742_u8BF7_u6C42&quot;&gt;&lt;a href=&quot;#u590D_u6742_u8BF7_u6C42&quot; class=&quot;headerlink&quot; title=&quot;复杂请求&quot;&gt;&lt;/a&gt;复杂请求&lt;/h3&gt;&lt;p&gt;　　到目前我们只介绍了简单请求，但是如果我们想做更多的操作怎么办？比如你需要发送PUT、DELTET等HTTP动作，或者发送Content-Type:application/json的内容。这时就需要我所说的复杂请求了。&lt;br&gt;　　复杂请求表面上看起来和简单请求使用上差不多，但实际上浏览器发送了不止一个请求。其中最先发送的是一种“预检请求”，此时作为服务端，也需要返回“预回应”作为响应。预检请求实际上是对服务端的一种权限请求，只有当预检请求成功返回，实际请求才开始执行。&lt;/p&gt;
 &lt;p&gt;JavaScript：&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;
 var url = &#39;http://api.alice.com/cors&#39;;
@@ -237,7 +237,7 @@ xhr.setRequestHeader(
 xhr.send();
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;预请求：&lt;/p&gt;
+&lt;p&gt;预检请求：&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;
 OPTIONS /cors HTTP/1.1
 &lt;b&gt;Origin&lt;/b&gt;: http://api.bob.com
@@ -249,15 +249,15 @@ Connection: keep-alive
 User-Agent: Mozilla/5.0...
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;　　类似简单请求，预请求也包含CORS需要的请求头。预请求用HTTP OPTIONS方法发送请求（确保你的服务器响应该方法的请求）。它也包含一些额外的请求头：&lt;/p&gt;
+&lt;p&gt;　　类似简单请求，预检请求也包含CORS需要的请求头。预检请求用HTTP OPTIONS方法发送请求（确保你的服务器响应该方法的请求）。它也包含一些额外的请求头：&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;p&gt;Access-Control-Request-Method - 实际的HTTP请求方法，即使简单请求也会有该请求头。&lt;/p&gt;
 &lt;/li&gt;
 &lt;li&gt;&lt;p&gt;Access-Control-Request-Headers - 以逗号分隔的列表，请求所使用的header。&lt;/p&gt;
 &lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;　　预请求用来验证服务器是否允许执行实际的请求。服务器校验上面两个请求头，验证请求方法和请求头是有效和可处理的。如果允许则服务器应返回如下响应：&lt;/p&gt;
-&lt;p&gt;预请求：&lt;/p&gt;
+&lt;p&gt;　　预检请求用来验证服务器是否允许执行实际的请求。服务器校验上面两个请求头，验证请求方法和请求头是有效和可处理的。如果允许则服务器应返回如下响应：&lt;/p&gt;
+&lt;p&gt;预检请求：&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;
 OPTIONS /cors HTTP/1.1
 &lt;b&gt;Origin&lt;/b&gt;: http://api.bob.com
@@ -279,9 +279,9 @@ Content-Type: text/html; charset=utf-8
 
 &lt;p&gt;Access-Control-Allow-Origin（必含） - 类似简单请求的响应，预响应也应该包含该响应头。&lt;/p&gt;
 &lt;p&gt;Access-Control-Allow-Methods（必含) - 以逗号分隔的列表，服务器支持的请求方法。&lt;/p&gt;
-&lt;p&gt;Access-Control-Allow-Headers（如果请求有Access-Control-Request-Headers请求头，该项为必含）- 以逗号分隔的列表，服务器支持的请求头。类似 上面的 Access-Control-Allow-Methods ，列出了服务器支持的所有的header，而不仅仅是预请求中的 Access-Control-Request-Headers。&lt;/p&gt;
+&lt;p&gt;Access-Control-Allow-Headers（如果请求有Access-Control-Request-Headers请求头，该项为必含）- 以逗号分隔的列表，服务器支持的请求头。类似 上面的 Access-Control-Allow-Methods ，列出了服务器支持的所有的header，而不仅仅是预检请求中的 Access-Control-Request-Headers。&lt;/p&gt;
 &lt;p&gt;Access-Control-Allow-Credentials（可选） - 和简单请求定义一样。&lt;/p&gt;
-&lt;p&gt;Access-Control-Max-Age (可选) - 预检对服务器带来很大压力，因为客户端每次操作都执行两次请求。preflight response 可以缓存起来，来减轻服务器压力，该项设置了缓存失效时间。&lt;/p&gt;
+&lt;p&gt;Access-Control-Max-Age (可选) - 缓存预检请求结果，该项设置了缓存有效时间。&lt;/p&gt;
 &lt;p&gt;一旦预检成功，浏览器将发起实际请求，看起来和简单请求一样。响应也类似：&lt;/p&gt;
 &lt;p&gt;实际请求:&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;
@@ -320,6 +320,31 @@ User-Agent: Mozilla/5.0...
 &lt;/blockquote&gt;
 &lt;p&gt;浏览器不会给出详细的错误情况，仅仅告知我们请求出错了。&lt;/p&gt;
 &lt;h3 id=&quot;u5B89_u5168_u95EE_u9898&quot;&gt;&lt;a href=&quot;#u5B89_u5168_u95EE_u9898&quot; class=&quot;headerlink&quot; title=&quot;安全问题&quot;&gt;&lt;/a&gt;安全问题&lt;/h3&gt;&lt;p&gt;跨域请求始终是网页安全中一个比较头疼的问题，CORS提供了一种跨域请求方案，但没有为安全访问提供足够的保障机制，如果你需要信息的绝对安全，不要依赖CORS当中的权限制度，应当使用更多其它的措施来保障，比如OAuth2。&lt;/p&gt;
+&lt;h2 id=&quot;JQuery_u8DE8_u57DF_u8BF7_u6C42&quot;&gt;&lt;a href=&quot;#JQuery_u8DE8_u57DF_u8BF7_u6C42&quot; class=&quot;headerlink&quot; title=&quot;JQuery跨域请求&quot;&gt;&lt;/a&gt;JQuery跨域请求&lt;/h2&gt;&lt;p&gt;　　$.ajax()方法即可以发送XHR请求也可以发送CORS请求。下面是几点注意事项：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;JQuery的CORS实现不支持IE浏览器，但是可以通过JQuery插件来支持IE浏览器。详情请参阅：&lt;a href=&quot;http://bugs.jquery.com/ticket/8283&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://bugs.jquery.com/ticket/8283 &lt;/a&gt;。&lt;/li&gt;
+&lt;li&gt;如果浏览器支持CROS，$.support.cors返回值为 true（IE返回false，参考上一条）。这样可以快速判断浏览器是否支持CORS。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;　　下面是JQuery发送CORS请求代码。&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;$.ajax(&amp;#123;// The &amp;#39;type&amp;#39; property sets the HTTP method.// A value of &amp;#39;PUT&amp;#39; or &amp;#39;DELETE&amp;#39; will trigger a preflight request.&amp;#10;  type: &amp;#39;GET&amp;#39;,// The URL to make the request to.&amp;#10;  url: &amp;#39;http://updates.html5rocks.com&amp;#39;,// The &amp;#39;contentType&amp;#39; property sets the &amp;#39;Content-Type&amp;#39; header.// The JQuery default for this property is// &amp;#39;application/x-www-form-urlencoded; charset=UTF-8&amp;#39;, which does not trigger// a preflight. If you set this value to anything other than// application/x-www-form-urlencoded, multipart/form-data, or text/plain,// you will trigger a preflight request.&amp;#10;  contentType: &amp;#39;text/plain&amp;#39;,&amp;#10;&amp;#10;  xhrFields: &amp;#123;// The &amp;#39;xhrFields&amp;#39; property sets additional fields on the XMLHttpRequest.// This can be used to set the &amp;#39;withCredentials&amp;#39; property.// Set the value to &amp;#39;true&amp;#39; if you&amp;#39;d like to pass cookies to the server.// If this is enabled, your server must respond with the header// &amp;#39;Access-Control-Allow-Credentials: true&amp;#39;.&amp;#10;    withCredentials: false&amp;#125;,&amp;#10;&amp;#10;  headers: &amp;#123;// Set any custom headers here.// If you set any non-simple headers, your server must include these// headers in the &amp;#39;Access-Control-Allow-Headers&amp;#39; response header.&amp;#125;,&amp;#10;&amp;#10;  success: function() &amp;#123;// Here&amp;#39;s where you handle a successful response.&amp;#125;,&amp;#10;&amp;#10;  error: function() &amp;#123;// Here&amp;#39;s where you handle an error response.// Note that if the error was due to a CORS issue,// this function will still fire, but there won&amp;#39;t be any additional// information about the error.&amp;#125;&amp;#125;);&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;h2 id=&quot;Cross-Domain_from_Chrome_Extensions&quot;&gt;&lt;a href=&quot;#Cross-Domain_from_Chrome_Extensions&quot; class=&quot;headerlink&quot; title=&quot;Cross-Domain from Chrome Extensions&quot;&gt;&lt;/a&gt;Cross-Domain from Chrome Extensions&lt;/h2&gt;&lt;p&gt;　　Chrome extensions support cross-domain requests in a two different ways:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Include domain in manifest.json - Chrome extensions can make cross-domain requests to any domain &lt;em&gt;if&lt;/em&gt; the domain is included in the “permissions” section of the manifest.json file:&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;&amp;#34;permissions&amp;#34;: [ &amp;#34;http://*.html5rocks.com&amp;#34;]&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;The server doesn’t need to include any additional CORS headers or do any more work in order for the request to succeed.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;CORS request - If the domain is not in the manifest.json file, then the Chrome extension makes a standard CORS request. The value of the Origin header is “chrome-extension://[CHROME EXTENSION ID]”. This means requests from Chrome extensions are subject to the same CORS rules described in this article.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&quot;u5DF2_u77E5_u95EE_u9898&quot;&gt;&lt;a href=&quot;#u5DF2_u77E5_u95EE_u9898&quot; class=&quot;headerlink&quot; title=&quot;已知问题&quot;&gt;&lt;/a&gt;已知问题&lt;/h2&gt;&lt;p&gt;　　下面是截至到2013年10月2日时的已知问题：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;请求发生错误时，不能提供详细的错误信息。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&quot;u670D_u52A1_u5668_u5904_u7406CORS_u8BF7_u6C42_u6D41_u7A0B_u56FE&quot;&gt;&lt;a href=&quot;#u670D_u52A1_u5668_u5904_u7406CORS_u8BF7_u6C42_u6D41_u7A0B_u56FE&quot; class=&quot;headerlink&quot; title=&quot;服务器处理CORS请求流程图&quot;&gt;&lt;/a&gt;服务器处理CORS请求流程图&lt;/h2&gt;&lt;p&gt;　　&lt;img src=&quot;/images/cors_server_flowchart.png&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
+&lt;h2 id=&quot;u9605_u8BFB_u66F4_u591A&quot;&gt;&lt;a href=&quot;#u9605_u8BFB_u66F4_u591A&quot; class=&quot;headerlink&quot; title=&quot;阅读更多&quot;&gt;&lt;/a&gt;阅读更多&lt;/h2&gt;&lt;ol&gt;
+&lt;li&gt;&lt;a href=&quot;http://www.w3.org/TR/cors/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;The CORS Spec&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;http://www.nczonline.net/blog/2010/05/25/cross-domain-ajax-with-cross-origin-resource-sharing/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Cross-domain Ajax with Cross-Origin Resource Sharing&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;http://enable-cors.org/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;enable-cors.org&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
 &lt;hr&gt;
 &lt;blockquote&gt;
 &lt;p&gt;编译自&lt;a href=&quot;http://www.html5rocks.com/en/tutorials/cors/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://www.html5rocks.com/en/tutorials/cors/&lt;/a&gt;    &lt;br&gt;作者：Monsur Hossain&lt;br&gt;本文中的所有译文仅用于学习和交流目的，转载请务必注明文章译者、出处、和本文链接，本文翻译工作遵照 &lt;a href=&quot;http://zh.wikipedia.org/wiki/Wikipedia:CC&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;CC协议&lt;/a&gt;，如果有侵犯到您的权益，请及时联系我。&lt;/p&gt;
@@ -346,7 +371,7 @@ User-Agent: Mozilla/5.0...
     <link href="http://emou.me/2016/02/03/beginning/"/>
     <id>http://emou.me/2016/02/03/beginning/</id>
     <published>2016-02-03T13:11:00.000Z</published>
-    <updated>2016-02-27T02:16:31.252Z</updated>
+    <updated>2016-02-27T14:15:06.054Z</updated>
     
     <content type="html">&lt;h4 id=&quot;The_beginning_is_the_most_important_part_of_the_work-__u2013_Plato&quot;&gt;&lt;a href=&quot;#The_beginning_is_the_most_important_part_of_the_work-__u2013_Plato&quot; class=&quot;headerlink&quot; title=&quot;The beginning is the most important part of the work. – Plato&quot;&gt;&lt;/a&gt;The beginning is the most important part of the work. – Plato&lt;/h4&gt;&lt;p&gt;&lt;img src=&quot;/images/05085938_15936.jpg&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
 </content>
