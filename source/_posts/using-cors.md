@@ -194,7 +194,7 @@ CORS流程图
 
 　　简单请求的特征就是这样，可以由浏览器完成请求无需CORS。比如，JSON-P可以发出跨域GET请求。Or HTML could be used to do a form POST.
 
-　　任何一个不满足上述条件的请求都是复杂请求，复杂请求需要额外的预请求（preflight request），下面我们将介绍。
+　　任何一个不满足上述条件的请求都是复杂请求，复杂请求需要额外的预检请求（preflight request），下面我们将介绍。
 ### 简单请求
 
 　　我们先看一个简单请求。下面是JavaScript代码，紧随其后的是浏览器发出的请求，粗体字表示CORS请求所需的header。
@@ -254,7 +254,7 @@ Content-Type: text/html; charset=utf-8
 ### 复杂请求
 
 　　到目前我们只介绍了简单请求，但是如果我们想做更多的操作怎么办？比如你需要发送PUT、DELTET等HTTP动作，或者发送Content-Type:application/json的内容。这时就需要我所说的复杂请求了。
-　　复杂请求表面上看起来和简单请求使用上差不多，但实际上浏览器发送了不止一个请求。其中最先发送的是一种“预请求”，此时作为服务端，也需要返回“预回应”作为响应。预请求实际上是对服务端的一种权限请求，只有当预请求成功返回，实际请求才开始执行。
+　　复杂请求表面上看起来和简单请求使用上差不多，但实际上浏览器发送了不止一个请求。其中最先发送的是一种“预检请求”，此时作为服务端，也需要返回“预回应”作为响应。预检请求实际上是对服务端的一种权限请求，只有当预检请求成功返回，实际请求才开始执行。
 
 JavaScript：
 <pre><code>
@@ -265,7 +265,7 @@ xhr.setRequestHeader(
 xhr.send();
 </code></pre>
 
-预请求：
+预检请求：
 <pre><code>
 OPTIONS /cors HTTP/1.1
 <b>Origin</b>: http://api.bob.com
@@ -277,14 +277,14 @@ Connection: keep-alive
 User-Agent: Mozilla/5.0...
 </code></pre>
 
-　　类似简单请求，预请求也包含CORS需要的请求头。预请求用HTTP OPTIONS方法发送请求（确保你的服务器响应该方法的请求）。它也包含一些额外的请求头：
+　　类似简单请求，预检请求也包含CORS需要的请求头。预检请求用HTTP OPTIONS方法发送请求（确保你的服务器响应该方法的请求）。它也包含一些额外的请求头：
 * Access-Control-Request-Method - 实际的HTTP请求方法，即使简单请求也会有该请求头。
 
 * Access-Control-Request-Headers - 以逗号分隔的列表，请求所使用的header。
 
-　　预请求用来验证服务器是否允许执行实际的请求。服务器校验上面两个请求头，验证请求方法和请求头是有效和可处理的。如果允许则服务器应返回如下响应：
+　　预检请求用来验证服务器是否允许执行实际的请求。服务器校验上面两个请求头，验证请求方法和请求头是有效和可处理的。如果允许则服务器应返回如下响应：
 
-预请求：
+预检请求：
 <pre><code>
 OPTIONS /cors HTTP/1.1
 <b>Origin</b>: http://api.bob.com
@@ -308,11 +308,11 @@ Access-Control-Allow-Origin（必含） - 类似简单请求的响应，预响�
 
 Access-Control-Allow-Methods（必含) - 以逗号分隔的列表，服务器支持的请求方法。
 
-Access-Control-Allow-Headers（如果请求有Access-Control-Request-Headers请求头，该项为必含）- 以逗号分隔的列表，服务器支持的请求头。类似 上面的 Access-Control-Allow-Methods ，列出了服务器支持的所有的header，而不仅仅是预请求中的 Access-Control-Request-Headers。
+Access-Control-Allow-Headers（如果请求有Access-Control-Request-Headers请求头，该项为必含）- 以逗号分隔的列表，服务器支持的请求头。类似 上面的 Access-Control-Allow-Methods ，列出了服务器支持的所有的header，而不仅仅是预检请求中的 Access-Control-Request-Headers。
 
 Access-Control-Allow-Credentials（可选） - 和简单请求定义一样。
 
-Access-Control-Max-Age (可选) - 预检对服务器带来很大压力，因为客户端每次操作都执行两次请求。preflight response 可以缓存起来，来减轻服务器压力，该项设置了缓存失效时间。
+Access-Control-Max-Age (可选) - 缓存预检请求结果，该项设置了缓存有效时间。
 
 一旦预检成功，浏览器将发起实际请求，看起来和简单请求一样。响应也类似：
 
@@ -362,6 +362,50 @@ Content-Type: text/html; charset=utf-8
 ### 安全问题
 
 跨域请求始终是网页安全中一个比较头疼的问题，CORS提供了一种跨域请求方案，但没有为安全访问提供足够的保障机制，如果你需要信息的绝对安全，不要依赖CORS当中的权限制度，应当使用更多其它的措施来保障，比如OAuth2。
+
+## JQuery跨域请求
+
+　　$.ajax()方法即可以发送XHR请求也可以发送CORS请求。下面是几点注意事项：
+* JQuery的CORS实现不支持IE浏览器，但是可以通过JQuery插件来支持IE浏览器。详情请参阅：[http://bugs.jquery.com/ticket/8283 ](http://bugs.jquery.com/ticket/8283 )。
+* 如果浏览器支持CROS，$.support.cors返回值为 true（IE返回false，参考上一条）。这样可以快速判断浏览器是否支持CORS。
+
+　　下面是JQuery发送CORS请求代码。
+```
+$.ajax({// The 'type' property sets the HTTP method.// A value of 'PUT' or 'DELETE' will trigger a preflight request.
+  type: 'GET',// The URL to make the request to.
+  url: 'http://updates.html5rocks.com',// The 'contentType' property sets the 'Content-Type' header.// The JQuery default for this property is// 'application/x-www-form-urlencoded; charset=UTF-8', which does not trigger// a preflight. If you set this value to anything other than// application/x-www-form-urlencoded, multipart/form-data, or text/plain,// you will trigger a preflight request.
+  contentType: 'text/plain',
+
+  xhrFields: {// The 'xhrFields' property sets additional fields on the XMLHttpRequest.// This can be used to set the 'withCredentials' property.// Set the value to 'true' if you'd like to pass cookies to the server.// If this is enabled, your server must respond with the header// 'Access-Control-Allow-Credentials: true'.
+    withCredentials: false},
+
+  headers: {// Set any custom headers here.// If you set any non-simple headers, your server must include these// headers in the 'Access-Control-Allow-Headers' response header.},
+
+  success: function() {// Here's where you handle a successful response.},
+
+  error: function() {// Here's where you handle an error response.// Note that if the error was due to a CORS issue,// this function will still fire, but there won't be any additional// information about the error.}});
+```
+
+## Cross-Domain from Chrome Extensions
+　　Chrome extensions support cross-domain requests in a two different ways:
+1. Include domain in manifest.json - Chrome extensions can make cross-domain requests to any domain *if* the domain is included in the "permissions" section of the manifest.json file:
+```
+"permissions": [ "http://*.html5rocks.com"]
+```
+The server doesn't need to include any additional CORS headers or do any more work in order for the request to succeed.
+2. CORS request - If the domain is not in the manifest.json file, then the Chrome extension makes a standard CORS request. The value of the Origin header is "chrome-extension://[CHROME EXTENSION ID]". This means requests from Chrome extensions are subject to the same CORS rules described in this article.
+
+## 已知问题
+　　下面是截至到2013年10月2日时的已知问题：
+* 请求发生错误时，不能提供详细的错误信息。
+
+## 服务器处理CORS请求流程图
+　　![](/images/cors_server_flowchart.png)
+
+## 阅读更多
+1. [The CORS Spec](http://www.w3.org/TR/cors/)
+2. [Cross-domain Ajax with Cross-Origin Resource Sharing](http://www.nczonline.net/blog/2010/05/25/cross-domain-ajax-with-cross-origin-resource-sharing/)
+3. [enable-cors.org](http://enable-cors.org/)
 
 ---
 >编译自[http://www.html5rocks.com/en/tutorials/cors/](http://www.html5rocks.com/en/tutorials/cors/)    <br>作者：Monsur Hossain
