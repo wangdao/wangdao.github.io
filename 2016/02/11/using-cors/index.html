@@ -68,7 +68,8 @@
 <meta property="og:description" content="引言　　API的出现增强了富web应用开发的体验。曾经想通过跨域请求api非常困难可以使用json-p这样的技术（有安全限制）或者自己搭建搭服务器。　　　　跨域资源共享（CORS）是一种W3C的规范，允许浏览器进行跨域通信。通过设置XMLHttpRequest对象，CORS允许开发者像发起同域请求那样发起跨域请求。
 　　想象下，网站bob.com想要访问alice.com网站上的一些数据。这种请求">
 <meta property="og:image" content="http://emou.me/images/20160227021223.png">
-<meta property="og:updated_time" content="2016-02-27T02:56:33.113Z">
+<meta property="og:image" content="http://emou.me/images/cors_server_flowchart.png">
+<meta property="og:updated_time" content="2016-02-27T15:30:52.288Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="使用CORS进行跨域请求">
 <meta name="twitter:description" content="引言　　API的出现增强了富web应用开发的体验。曾经想通过跨域请求api非常困难可以使用json-p这样的技术（有安全限制）或者自己搭建搭服务器。　　　　跨域资源共享（CORS）是一种W3C的规范，允许浏览器进行跨域通信。通过设置XMLHttpRequest对象，CORS允许开发者像发起同域请求那样发起跨域请求。
@@ -456,7 +457,7 @@ xhr.withCredentials = true;
 </li>
 </ul>
 <p>　　简单请求的特征就是这样，可以由浏览器完成请求无需CORS。比如，JSON-P可以发出跨域GET请求。Or HTML could be used to do a form POST.</p>
-<p>　　任何一个不满足上述条件的请求都是复杂请求，复杂请求需要额外的预请求（preflight request），下面我们将介绍。</p>
+<p>　　任何一个不满足上述条件的请求都是复杂请求，复杂请求需要额外的预检请求（preflight request），下面我们将介绍。</p>
 <h3 id="u7B80_u5355_u8BF7_u6C42"><a href="#u7B80_u5355_u8BF7_u6C42" class="headerlink" title="简单请求"></a>简单请求</h3><p>　　我们先看一个简单请求。下面是JavaScript代码，紧随其后的是浏览器发出的请求，粗体字表示CORS请求所需的header。<br>JavaScript:</p>
 <pre><code>
 var url = 'http://api.alice.com/cors';
@@ -509,7 +510,7 @@ Content-Type: text/html; charset=utf-8
 </li>
 </ul>
 <p>　　如果你希望客户端能获得到其他header信息，你必须设置Access-Control-Expose-Headers。其值为其他相应头名字，多个值之间用逗号隔开。</p>
-<h3 id="u590D_u6742_u8BF7_u6C42"><a href="#u590D_u6742_u8BF7_u6C42" class="headerlink" title="复杂请求"></a>复杂请求</h3><p>　　到目前我们只介绍了简单请求，但是如果我们想做更多的操作怎么办？比如你需要发送PUT、DELTET等HTTP动作，或者发送Content-Type:application/json的内容。这时就需要我所说的复杂请求了。<br>　　复杂请求表面上看起来和简单请求使用上差不多，但实际上浏览器发送了不止一个请求。其中最先发送的是一种“预请求”，此时作为服务端，也需要返回“预回应”作为响应。预请求实际上是对服务端的一种权限请求，只有当预请求成功返回，实际请求才开始执行。</p>
+<h3 id="u590D_u6742_u8BF7_u6C42"><a href="#u590D_u6742_u8BF7_u6C42" class="headerlink" title="复杂请求"></a>复杂请求</h3><p>　　到目前我们只介绍了简单请求，但是如果我们想做更多的操作怎么办？比如你需要发送PUT、DELTET等HTTP动作，或者发送Content-Type:application/json的内容。这时就需要我所说的复杂请求了。<br>　　复杂请求表面上看起来和简单请求使用上差不多，但实际上浏览器发送了不止一个请求。其中最先发送的是一种“预检请求”，此时作为服务端，也需要返回“预回应”作为响应。预检请求实际上是对服务端的一种权限请求，只有当预检请求成功返回，实际请求才开始执行。</p>
 <p>JavaScript：</p>
 <pre><code>
 var url = 'http://api.alice.com/cors';
@@ -519,7 +520,7 @@ xhr.setRequestHeader(
 xhr.send();
 </code></pre>
 
-<p>预请求：</p>
+<p>预检请求：</p>
 <pre><code>
 OPTIONS /cors HTTP/1.1
 <b>Origin</b>: http://api.bob.com
@@ -531,15 +532,15 @@ Connection: keep-alive
 User-Agent: Mozilla/5.0...
 </code></pre>
 
-<p>　　类似简单请求，预请求也包含CORS需要的请求头。预请求用HTTP OPTIONS方法发送请求（确保你的服务器响应该方法的请求）。它也包含一些额外的请求头：</p>
+<p>　　类似简单请求，预检请求也包含CORS需要的请求头。预检请求用HTTP OPTIONS方法发送请求（确保你的服务器响应该方法的请求）。它也包含一些额外的请求头：</p>
 <ul>
 <li><p>Access-Control-Request-Method - 实际的HTTP请求方法，即使简单请求也会有该请求头。</p>
 </li>
 <li><p>Access-Control-Request-Headers - 以逗号分隔的列表，请求所使用的header。</p>
 </li>
 </ul>
-<p>　　预请求用来验证服务器是否允许执行实际的请求。服务器校验上面两个请求头，验证请求方法和请求头是有效和可处理的。如果允许则服务器应返回如下响应：</p>
-<p>预请求：</p>
+<p>　　预检请求用来验证服务器是否允许执行实际的请求。服务器校验上面两个请求头，验证请求方法和请求头是有效和可处理的。如果允许则服务器应返回如下响应：</p>
+<p>预检请求：</p>
 <pre><code>
 OPTIONS /cors HTTP/1.1
 <b>Origin</b>: http://api.bob.com
@@ -561,9 +562,9 @@ Content-Type: text/html; charset=utf-8
 
 <p>Access-Control-Allow-Origin（必含） - 类似简单请求的响应，预响应也应该包含该响应头。</p>
 <p>Access-Control-Allow-Methods（必含) - 以逗号分隔的列表，服务器支持的请求方法。</p>
-<p>Access-Control-Allow-Headers（如果请求有Access-Control-Request-Headers请求头，该项为必含）- 以逗号分隔的列表，服务器支持的请求头。类似 上面的 Access-Control-Allow-Methods ，列出了服务器支持的所有的header，而不仅仅是预请求中的 Access-Control-Request-Headers。</p>
+<p>Access-Control-Allow-Headers（如果请求有Access-Control-Request-Headers请求头，该项为必含）- 以逗号分隔的列表，服务器支持的请求头。类似 上面的 Access-Control-Allow-Methods ，列出了服务器支持的所有的header，而不仅仅是预检请求中的 Access-Control-Request-Headers。</p>
 <p>Access-Control-Allow-Credentials（可选） - 和简单请求定义一样。</p>
-<p>Access-Control-Max-Age (可选) - 预检对服务器带来很大压力，因为客户端每次操作都执行两次请求。preflight response 可以缓存起来，来减轻服务器压力，该项设置了缓存失效时间。</p>
+<p>Access-Control-Max-Age (可选) - 缓存预检请求结果，该项设置了缓存有效时间。</p>
 <p>一旦预检成功，浏览器将发起实际请求，看起来和简单请求一样。响应也类似：</p>
 <p>实际请求:</p>
 <pre><code>
@@ -602,6 +603,31 @@ User-Agent: Mozilla/5.0...
 </blockquote>
 <p>浏览器不会给出详细的错误情况，仅仅告知我们请求出错了。</p>
 <h3 id="u5B89_u5168_u95EE_u9898"><a href="#u5B89_u5168_u95EE_u9898" class="headerlink" title="安全问题"></a>安全问题</h3><p>跨域请求始终是网页安全中一个比较头疼的问题，CORS提供了一种跨域请求方案，但没有为安全访问提供足够的保障机制，如果你需要信息的绝对安全，不要依赖CORS当中的权限制度，应当使用更多其它的措施来保障，比如OAuth2。</p>
+<h2 id="JQuery_u8DE8_u57DF_u8BF7_u6C42"><a href="#JQuery_u8DE8_u57DF_u8BF7_u6C42" class="headerlink" title="JQuery跨域请求"></a>JQuery跨域请求</h2><p>　　$.ajax()方法即可以发送XHR请求也可以发送CORS请求。下面是几点注意事项：</p>
+<ul>
+<li>JQuery的CORS实现不支持IE浏览器，但是可以通过JQuery插件来支持IE浏览器。详情请参阅：<a href="http://bugs.jquery.com/ticket/8283" target="_blank" rel="external">http://bugs.jquery.com/ticket/8283 </a>。</li>
+<li>如果浏览器支持CROS，$.support.cors返回值为 true（IE返回false，参考上一条）。这样可以快速判断浏览器是否支持CORS。</li>
+</ul>
+<p>　　下面是JQuery发送CORS请求代码。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$.ajax(&#123;// The &#39;type&#39; property sets the HTTP method.// A value of &#39;PUT&#39; or &#39;DELETE&#39; will trigger a preflight request.&#10;  type: &#39;GET&#39;,// The URL to make the request to.&#10;  url: &#39;http://updates.html5rocks.com&#39;,// The &#39;contentType&#39; property sets the &#39;Content-Type&#39; header.// The JQuery default for this property is// &#39;application/x-www-form-urlencoded; charset=UTF-8&#39;, which does not trigger// a preflight. If you set this value to anything other than// application/x-www-form-urlencoded, multipart/form-data, or text/plain,// you will trigger a preflight request.&#10;  contentType: &#39;text/plain&#39;,&#10;&#10;  xhrFields: &#123;// The &#39;xhrFields&#39; property sets additional fields on the XMLHttpRequest.// This can be used to set the &#39;withCredentials&#39; property.// Set the value to &#39;true&#39; if you&#39;d like to pass cookies to the server.// If this is enabled, your server must respond with the header// &#39;Access-Control-Allow-Credentials: true&#39;.&#10;    withCredentials: false&#125;,&#10;&#10;  headers: &#123;// Set any custom headers here.// If you set any non-simple headers, your server must include these// headers in the &#39;Access-Control-Allow-Headers&#39; response header.&#125;,&#10;&#10;  success: function() &#123;// Here&#39;s where you handle a successful response.&#125;,&#10;&#10;  error: function() &#123;// Here&#39;s where you handle an error response.// Note that if the error was due to a CORS issue,// this function will still fire, but there won&#39;t be any additional// information about the error.&#125;&#125;);</span><br></pre></td></tr></table></figure></p>
+<h2 id="Cross-Domain_from_Chrome_Extensions"><a href="#Cross-Domain_from_Chrome_Extensions" class="headerlink" title="Cross-Domain from Chrome Extensions"></a>Cross-Domain from Chrome Extensions</h2><p>　　Chrome extensions support cross-domain requests in a two different ways:</p>
+<ol>
+<li>Include domain in manifest.json - Chrome extensions can make cross-domain requests to any domain <em>if</em> the domain is included in the “permissions” section of the manifest.json file:<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#34;permissions&#34;: [ &#34;http://*.html5rocks.com&#34;]</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>The server doesn’t need to include any additional CORS headers or do any more work in order for the request to succeed.</p>
+<ol>
+<li>CORS request - If the domain is not in the manifest.json file, then the Chrome extension makes a standard CORS request. The value of the Origin header is “chrome-extension://[CHROME EXTENSION ID]”. This means requests from Chrome extensions are subject to the same CORS rules described in this article.</li>
+</ol>
+<h2 id="u5DF2_u77E5_u95EE_u9898"><a href="#u5DF2_u77E5_u95EE_u9898" class="headerlink" title="已知问题"></a>已知问题</h2><p>　　下面是截至到2013年10月2日时的已知问题：</p>
+<ul>
+<li>请求发生错误时，不能提供详细的错误信息。</li>
+</ul>
+<h2 id="u670D_u52A1_u5668_u5904_u7406CORS_u8BF7_u6C42_u6D41_u7A0B_u56FE"><a href="#u670D_u52A1_u5668_u5904_u7406CORS_u8BF7_u6C42_u6D41_u7A0B_u56FE" class="headerlink" title="服务器处理CORS请求流程图"></a>服务器处理CORS请求流程图</h2><p>　　<img src="/images/cors_server_flowchart.png" alt=""></p>
+<h2 id="u9605_u8BFB_u66F4_u591A"><a href="#u9605_u8BFB_u66F4_u591A" class="headerlink" title="阅读更多"></a>阅读更多</h2><ol>
+<li><a href="http://www.w3.org/TR/cors/" target="_blank" rel="external">The CORS Spec</a></li>
+<li><a href="http://www.nczonline.net/blog/2010/05/25/cross-domain-ajax-with-cross-origin-resource-sharing/" target="_blank" rel="external">Cross-domain Ajax with Cross-Origin Resource Sharing</a></li>
+<li><a href="http://enable-cors.org/" target="_blank" rel="external">enable-cors.org</a></li>
+</ol>
 <hr>
 <blockquote>
 <p>编译自<a href="http://www.html5rocks.com/en/tutorials/cors/" target="_blank" rel="external">http://www.html5rocks.com/en/tutorials/cors/</a>    <br>作者：Monsur Hossain<br>本文中的所有译文仅用于学习和交流目的，转载请务必注明文章译者、出处、和本文链接，本文翻译工作遵照 <a href="http://zh.wikipedia.org/wiki/Wikipedia:CC" target="_blank" rel="external">CC协议</a>，如果有侵犯到您的权益，请及时联系我。</p>
@@ -797,7 +823,7 @@ User-Agent: Mozilla/5.0...
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#u5F15_u8A00"><span class="nav-number">1.</span> <span class="nav-text">引言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#u4F7F_u7528CORS_u8BF7_u6C42"><span class="nav-number">2.</span> <span class="nav-text">使用CORS请求</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#u521B_u5EFAXMLHttpRequest_u5BF9_u8C61"><span class="nav-number">2.1.</span> <span class="nav-text">创建XMLHttpRequest对象</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Event_handlers"><span class="nav-number">2.2.</span> <span class="nav-text">Event handlers</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#withCredentials"><span class="nav-number">2.3.</span> <span class="nav-text">withCredentials</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#u53D1_u9001_u8BF7_u6C42"><span class="nav-number">2.4.</span> <span class="nav-text">发送请求</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#u5B8C_u6574_u4F8B_u5B50"><span class="nav-number">2.5.</span> <span class="nav-text">完整例子</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#u670D_u52A1_u5668_u914D_u7F6E"><span class="nav-number">3.</span> <span class="nav-text">服务器配置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#CORS_u8BF7_u6C42_u5206_u7C7B"><span class="nav-number">3.1.</span> <span class="nav-text">CORS请求分类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#u7B80_u5355_u8BF7_u6C42"><span class="nav-number">3.2.</span> <span class="nav-text">简单请求</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#u590D_u6742_u8BF7_u6C42"><span class="nav-number">3.3.</span> <span class="nav-text">复杂请求</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#u5B89_u5168_u95EE_u9898"><span class="nav-number">3.4.</span> <span class="nav-text">安全问题</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#u5F15_u8A00"><span class="nav-number">1.</span> <span class="nav-text">引言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#u4F7F_u7528CORS_u8BF7_u6C42"><span class="nav-number">2.</span> <span class="nav-text">使用CORS请求</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#u521B_u5EFAXMLHttpRequest_u5BF9_u8C61"><span class="nav-number">2.1.</span> <span class="nav-text">创建XMLHttpRequest对象</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Event_handlers"><span class="nav-number">2.2.</span> <span class="nav-text">Event handlers</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#withCredentials"><span class="nav-number">2.3.</span> <span class="nav-text">withCredentials</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#u53D1_u9001_u8BF7_u6C42"><span class="nav-number">2.4.</span> <span class="nav-text">发送请求</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#u5B8C_u6574_u4F8B_u5B50"><span class="nav-number">2.5.</span> <span class="nav-text">完整例子</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#u670D_u52A1_u5668_u914D_u7F6E"><span class="nav-number">3.</span> <span class="nav-text">服务器配置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#CORS_u8BF7_u6C42_u5206_u7C7B"><span class="nav-number">3.1.</span> <span class="nav-text">CORS请求分类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#u7B80_u5355_u8BF7_u6C42"><span class="nav-number">3.2.</span> <span class="nav-text">简单请求</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#u590D_u6742_u8BF7_u6C42"><span class="nav-number">3.3.</span> <span class="nav-text">复杂请求</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#u5B89_u5168_u95EE_u9898"><span class="nav-number">3.4.</span> <span class="nav-text">安全问题</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#JQuery_u8DE8_u57DF_u8BF7_u6C42"><span class="nav-number">4.</span> <span class="nav-text">JQuery跨域请求</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Cross-Domain_from_Chrome_Extensions"><span class="nav-number">5.</span> <span class="nav-text">Cross-Domain from Chrome Extensions</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#u5DF2_u77E5_u95EE_u9898"><span class="nav-number">6.</span> <span class="nav-text">已知问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#u670D_u52A1_u5668_u5904_u7406CORS_u8BF7_u6C42_u6D41_u7A0B_u56FE"><span class="nav-number">7.</span> <span class="nav-text">服务器处理CORS请求流程图</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#u9605_u8BFB_u66F4_u591A"><span class="nav-number">8.</span> <span class="nav-text">阅读更多</span></a></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator">
