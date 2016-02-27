@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://emou.me/"/>
-  <updated>2016-02-26T18:27:30.732Z</updated>
+  <updated>2016-02-27T02:56:33.113Z</updated>
   <id>http://emou.me/</id>
   
   <author>
@@ -20,10 +20,9 @@
     <link href="http://emou.me/2016/02/11/using-cors/"/>
     <id>http://emou.me/2016/02/11/using-cors/</id>
     <published>2016-02-11T08:05:55.000Z</published>
-    <updated>2016-02-26T18:27:30.732Z</updated>
+    <updated>2016-02-27T02:56:33.113Z</updated>
     
-    <content type="html">&lt;h2 id=&quot;u5F15_u8A00&quot;&gt;&lt;a href=&quot;#u5F15_u8A00&quot; class=&quot;headerlink&quot; title=&quot;引言&quot;&gt;&lt;/a&gt;引言&lt;/h2&gt;&lt;p&gt;　　APIs are the threads that let you stitch together a rich web experience. But this experience has a hard time translating to the browser, where the options for cross-domain requests are limited to techniques like JSON-P (which has limited use due to security concerns) or setting up a custom proxy (which can be a pain to set up and maintain).&lt;/p&gt;
-&lt;p&gt;　　跨域资源共享（CORS）是一种W3C的规范，允许浏览器进行跨域通信。通过设置XMLHttpRequest对象，CORS允许开发者像发起同域请求那样发起跨域请求。&lt;/p&gt;
+    <content type="html">&lt;h2 id=&quot;u5F15_u8A00&quot;&gt;&lt;a href=&quot;#u5F15_u8A00&quot; class=&quot;headerlink&quot; title=&quot;引言&quot;&gt;&lt;/a&gt;引言&lt;/h2&gt;&lt;p&gt;　　API的出现增强了富web应用开发的体验。曾经想通过跨域请求api非常困难可以使用json-p这样的技术（有安全限制）或者自己搭建搭服务器。&lt;br&gt;　　&lt;br&gt;　　跨域资源共享（CORS）是一种W3C的规范，允许浏览器进行跨域通信。通过设置XMLHttpRequest对象，CORS允许开发者像发起同域请求那样发起跨域请求。&lt;/p&gt;
 &lt;p&gt;　　想象下，网站bob.com想要访问alice.com网站上的一些数据。这种请求是被同源策略所禁止的。然而，使用CORS，alice.com 增加些特殊响应头可以允许来自bob.com的请求。&lt;/p&gt;
 &lt;p&gt;　　从上面例子看出，使用CORS需要服务器和客户端之间相互了解。幸运的是，如果你是一位客户端开发者，你可以忽略里面的很多细节。本文将介绍客户端如何进行跨域请求，以及如何配置服务器以支持&lt;br&gt;CORS。&lt;/p&gt;
 &lt;h2 id=&quot;u4F7F_u7528CORS_u8BF7_u6C42&quot;&gt;&lt;a href=&quot;#u4F7F_u7528CORS_u8BF7_u6C42&quot; class=&quot;headerlink&quot; title=&quot;使用CORS请求&quot;&gt;&lt;/a&gt;使用CORS请求&lt;/h2&gt;&lt;p&gt;　　本节将介绍如何用Javascript进行跨域请求。&lt;/p&gt;
@@ -176,16 +175,46 @@ xhr.withCredentials = true;
 &lt;/ul&gt;
 &lt;p&gt;　　简单请求的特征就是这样，可以由浏览器完成请求无需CORS。比如，JSON-P可以发出跨域GET请求。Or HTML could be used to do a form POST.&lt;/p&gt;
 &lt;p&gt;　　任何一个不满足上述条件的请求都是复杂请求，复杂请求需要额外的预请求（preflight request），下面我们将介绍。&lt;/p&gt;
-&lt;h3 id=&quot;u7B80_u5355_u8BF7_u6C42&quot;&gt;&lt;a href=&quot;#u7B80_u5355_u8BF7_u6C42&quot; class=&quot;headerlink&quot; title=&quot;简单请求&quot;&gt;&lt;/a&gt;简单请求&lt;/h3&gt;&lt;p&gt;　　我们先看一个简单请求。下面是JavaScript代码，紧随其后的是浏览器发出的请求，粗体字表示CORS请求所需的header。&lt;br&gt;　　JavaScript:&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;var url = &amp;#39;http://api.alice.com/cors&amp;#39;;&amp;#10;var xhr = createCORSRequest(&amp;#39;GET&amp;#39;, url);&amp;#10;xhr.send();&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;　　HTTP请求:&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;GET /cors HTTP/1.1&amp;#10;**Origin**: http://api.bob.com&amp;#10;Host: api.alice.com&amp;#10;Accept-Language: en-US&amp;#10;Connection: keep-alive&amp;#10;User-Agent: Mozilla/5.0...&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;　　CORS请求总是包含一个&lt;strong&gt;Origin&lt;/strong&gt;请求头，它由浏览器添加。该值包含协议名、地址和一个可选的端口。例如：&lt;a href=&quot;http://api.alice.com&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://api.alice.com&lt;/a&gt;.&lt;br&gt;　　有&lt;strong&gt;Origin&lt;/strong&gt;请求头的请求并不一定是跨域请求。不仅跨域请求需要Origin请求头，一些同域请求也可能需要有该请求头。例如，Firefox在同域请求中不添加Origin请求头，但是Chrome和Safari在POST/PUT/DELETE同域请求中包含Origin请求头。下面是个栗子。&lt;br&gt;　　HTTP请求&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;POST /cors HTTP/1.1&amp;#10;**Origin** : http://api.bob.com&amp;#10;**Host**: api.bob.com&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;　　无论请求中是否有CORS所需的请求头，服务器都会响应。但是如果Origin中的域名不在服务器的允许列表中，服务器将返回错误信息。&lt;br&gt;　　下面是有效的响应，CORS所需headers用粗体表示。&lt;br&gt;　　HTTP 响应：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;**Access-Control-Allow-Origin**: http://api.bob.com&amp;#10;**Access-Control-Allow-Credentials**: true&amp;#10;**Access-Control-Expose-Headers**: FooBar&amp;#10;Content-Type: text/html; charset=utf-8&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;h3 id=&quot;u7B80_u5355_u8BF7_u6C42&quot;&gt;&lt;a href=&quot;#u7B80_u5355_u8BF7_u6C42&quot; class=&quot;headerlink&quot; title=&quot;简单请求&quot;&gt;&lt;/a&gt;简单请求&lt;/h3&gt;&lt;p&gt;　　我们先看一个简单请求。下面是JavaScript代码，紧随其后的是浏览器发出的请求，粗体字表示CORS请求所需的header。&lt;br&gt;JavaScript:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;
+var url = &#39;http://api.alice.com/cors&#39;;
+var xhr = createCORSRequest(&#39;GET&#39;, url);
+xhr.send();
+&lt;/code&gt;&lt;/pre&gt;
+HTTP请求:
+&lt;pre&gt;&lt;code&gt;
+GET /cors HTTP/1.1
+&lt;b&gt;Origin&lt;/b&gt;: http://api.bob.com
+Host: api.alice.com
+Accept-Language: en-US
+Connection: keep-alive
+User-Agent: Mozilla/5.0...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;　　CORS请求总是包含一个&lt;strong&gt;Origin&lt;/strong&gt;请求头，它由浏览器添加。该值包含协议名、地址和一个可选的端口。例如：&lt;a href=&quot;http://api.alice.com&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;http://api.alice.com&lt;/a&gt;.&lt;br&gt;　　有&lt;strong&gt;Origin&lt;/strong&gt;请求头的请求并不一定是跨域请求。不仅跨域请求需要Origin请求头，一些同域请求也可能需要有该请求头。例如，Firefox在同域请求中不添加Origin请求头，但是Chrome和Safari在POST/PUT/DELETE同域请求中包含Origin请求头。下面是个栗子。&lt;br&gt;　　HTTP请求&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;
+POST /cors HTTP/1.1
+&lt;b&gt;Origin&lt;/b&gt; : http://api.bob.com
+&lt;b&gt;Host&lt;/b&gt;: api.bob.com
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;　　无论请求中是否有CORS所需的请求头，服务器都会响应。但是如果Origin中的域名不在服务器的允许列表中，服务器将返回错误信息。&lt;br&gt;　　下面是有效的响应，CORS所需headers用粗体表示。&lt;br&gt;　　HTTP 响应：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;
+&lt;b&gt;Access-Control-Allow-Origin&lt;/b&gt;: http://api.bob.com
+&lt;b&gt;Access-Control-Allow-Credentials&lt;/b&gt;: true
+&lt;b&gt;Access-Control-Expose-Headers&lt;/b&gt;: FooBar
+Content-Type: text/html; charset=utf-8
+
+&lt;/code&gt;&lt;/pre&gt;
+
 &lt;p&gt;　　在响应中，和CORS相关项目都是以”Access-Control-“为前缀，具体含义如下：&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;p&gt;Access-Control-Allow-Origin (必含)-不可省略，否则CORS请求失败。该项表示服务器响应指定的域的CORS请求。值为 “*”时响应任何域的CORS请求。&lt;/p&gt;
 &lt;/li&gt;
 &lt;li&gt;&lt;p&gt;Access-Control-Allow-Credentials（可选）该项表示请求中是否包含Cookie信息，默认情况，请求中不包含Cookie信息。只有一个可选值true（必须小写）。如果不包含Cookie信息，请略去该项而不是设置其值为false。这一项与XmlHttpRequest2对象当中的withCredentials属性应保持一致，即withCredentials为true时该项也为true；withCredentials为false时，省略该项不写。反之则导致请求失败。除非你确实需要CORS请求中包含Cookie信息，否则不要设置该项。&lt;/p&gt;
 &lt;/li&gt;
+&lt;/ul&gt;
+&lt;ul&gt;
 &lt;li&gt;&lt;p&gt;Access-Control-Expose-Headers（可选）- XMLHttpRequest2 对象的getResponseHeader()方法返回相应头的信息。在CORS请求中，该方法只能获得一些简单信息。能获得的信息如下：&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;Cache-Control&lt;/li&gt;
@@ -197,10 +226,29 @@ xhr.withCredentials = true;
 &lt;/ul&gt;
 &lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;如果你希望客户端能获得到其他header信息，你必须设置Access-Control-Expose-Headers。其值为其他相应头名字，多个值之间用逗号隔开。&lt;/p&gt;
+&lt;p&gt;　　如果你希望客户端能获得到其他header信息，你必须设置Access-Control-Expose-Headers。其值为其他相应头名字，多个值之间用逗号隔开。&lt;/p&gt;
 &lt;h3 id=&quot;u590D_u6742_u8BF7_u6C42&quot;&gt;&lt;a href=&quot;#u590D_u6742_u8BF7_u6C42&quot; class=&quot;headerlink&quot; title=&quot;复杂请求&quot;&gt;&lt;/a&gt;复杂请求&lt;/h3&gt;&lt;p&gt;　　到目前我们只介绍了简单请求，但是如果我们想做更多的操作怎么办？比如你需要发送PUT、DELTET等HTTP动作，或者发送Content-Type:application/json的内容。这时就需要我所说的复杂请求了。&lt;br&gt;　　复杂请求表面上看起来和简单请求使用上差不多，但实际上浏览器发送了不止一个请求。其中最先发送的是一种“预请求”，此时作为服务端，也需要返回“预回应”作为响应。预请求实际上是对服务端的一种权限请求，只有当预请求成功返回，实际请求才开始执行。&lt;/p&gt;
-&lt;p&gt;JavaScript：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;var url = &amp;#39;http://api.alice.com/cors&amp;#39;;&amp;#10;var xhr = createCORSRequest(&amp;#39;PUT&amp;#39;, url);&amp;#10;xhr.setRequestHeader(&amp;#10;    &amp;#39;X-Custom-Header&amp;#39;, &amp;#39;value&amp;#39;);&amp;#10;xhr.send();&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;预请求：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;OPTIONS /cors HTTP/1.1&amp;#10;Origin: http://api.bob.com&amp;#10;Access-Control-Request-Method: PUT&amp;#10;Access-Control-Request-Headers: X-Custom-Header&amp;#10;Host: api.alice.com&amp;#10;Accept-Language: en-US&amp;#10;Connection: keep-alive&amp;#10;User-Agent: Mozilla/5.0...&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;JavaScript：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;
+var url = &#39;http://api.alice.com/cors&#39;;
+var xhr = createCORSRequest(&#39;PUT&#39;, url);
+xhr.setRequestHeader(
+    &#39;X-Custom-Header&#39;, &#39;value&#39;);
+xhr.send();
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;预请求：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;
+OPTIONS /cors HTTP/1.1
+&lt;b&gt;Origin&lt;/b&gt;: http://api.bob.com
+&lt;b&gt;Access-Control-Request-Method&lt;/b&gt;: PUT
+&lt;b&gt;Access-Control-Request-Headers&lt;/b&gt;: X-Custom-Header
+Host: api.alice.com
+Accept-Language: en-US
+Connection: keep-alive
+User-Agent: Mozilla/5.0...
+&lt;/code&gt;&lt;/pre&gt;
+
 &lt;p&gt;　　类似简单请求，预请求也包含CORS需要的请求头。预请求用HTTP OPTIONS方法发送请求（确保你的服务器响应该方法的请求）。它也包含一些额外的请求头：&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;p&gt;Access-Control-Request-Method - 实际的HTTP请求方法，即使简单请求也会有该请求头。&lt;/p&gt;
@@ -209,18 +257,62 @@ xhr.withCredentials = true;
 &lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;　　预请求用来验证服务器是否允许执行实际的请求。服务器校验上面两个请求头，验证请求方法和请求头是有效和可处理的。如果允许则服务器应返回如下响应：&lt;/p&gt;
-&lt;p&gt;预请求：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;OPTIONS /cors HTTP/1.1&amp;#10;Origin: http://api.bob.com&amp;#10;Access-Control-Request-Method: PUT&amp;#10;Access-Control-Request-Headers: X-Custom-Header&amp;#10;Host: api.alice.com&amp;#10;Accept-Language: en-US&amp;#10;Connection: keep-alive&amp;#10;User-Agent: Mozilla/5.0...&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;预响应&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;Access-Control-Allow-Origin: http://api.bob.com&amp;#10;Access-Control-Allow-Methods: GET, POST, PUT&amp;#10;Access-Control-Allow-Headers: X-Custom-Header&amp;#10;Content-Type: text/html; charset=utf-8&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;预请求：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;
+OPTIONS /cors HTTP/1.1
+&lt;b&gt;Origin&lt;/b&gt;: http://api.bob.com
+&lt;b&gt;Access-Control-Request-Method&lt;/b&gt;: PUT
+&lt;b&gt;Access-Control-Request-Headers&lt;/b&gt;: X-Custom-Header
+Host: api.alice.com
+Accept-Language: en-US
+Connection: keep-alive
+User-Agent: Mozilla/5.0...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;预响应&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;
+&lt;b&gt;Access-Control-Allow-Origin&lt;/b&gt;: http://api.bob.com
+&lt;b&gt;Access-Control-Allow-Methods&lt;/b&gt;: GET, POST, PUT
+&lt;b&gt;Access-Control-Allow-Headers&lt;/b&gt;: X-Custom-Header
+Content-Type: text/html; charset=utf-8
+&lt;/code&gt;&lt;/pre&gt;
+
 &lt;p&gt;Access-Control-Allow-Origin（必含） - 类似简单请求的响应，预响应也应该包含该响应头。&lt;/p&gt;
 &lt;p&gt;Access-Control-Allow-Methods（必含) - 以逗号分隔的列表，服务器支持的请求方法。&lt;/p&gt;
 &lt;p&gt;Access-Control-Allow-Headers（如果请求有Access-Control-Request-Headers请求头，该项为必含）- 以逗号分隔的列表，服务器支持的请求头。类似 上面的 Access-Control-Allow-Methods ，列出了服务器支持的所有的header，而不仅仅是预请求中的 Access-Control-Request-Headers。&lt;/p&gt;
 &lt;p&gt;Access-Control-Allow-Credentials（可选） - 和简单请求定义一样。&lt;/p&gt;
 &lt;p&gt;Access-Control-Max-Age (可选) - 预检对服务器带来很大压力，因为客户端每次操作都执行两次请求。preflight response 可以缓存起来，来减轻服务器压力，该项设置了缓存失效时间。&lt;/p&gt;
 &lt;p&gt;一旦预检成功，浏览器将发起实际请求，看起来和简单请求一样。响应也类似：&lt;/p&gt;
-&lt;p&gt;实际请求:&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;PUT /cors HTTP/1.1&amp;#10;Origin: http://api.bob.com&amp;#10;Host: api.alice.com&amp;#10;X-Custom-Header: value&amp;#10;Accept-Language: en-US&amp;#10;Connection: keep-alive&amp;#10;User-Agent: Mozilla/5.0...&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;实际响应:&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;Access-Control-Allow-Origin: http://api.bob.com&amp;#10;Content-Type: text/html; charset=utf-8&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;实际请求:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;
+PUT /cors HTTP/1.1
+&lt;b&gt;Origin&lt;/b&gt;: http://api.bob.com
+Host: api.alice.com
+&lt;b&gt;X-Custom-Header&lt;/b&gt;: value
+Accept-Language: en-US
+Connection: keep-alive
+User-Agent: Mozilla/5.0...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;实际响应:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;
+&lt;b&gt;Access-Control-Allow-Origin&lt;/b&gt;: http://api.bob.com
+Content-Type: text/html; charset=utf-8
+&lt;/code&gt;&lt;/pre&gt;
+
 &lt;p&gt;使服务器拒绝CORS请求，可以仅仅返回一个不包含任何CORS header的响应。预检失败服务器也应拒绝该次请求。由于响应里没有CORS特定的header，浏览器认为请求失败，不会发起实际请求:&lt;/p&gt;
-&lt;p&gt;预检请求：&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;OPTIONS /cors HTTP/1.1&amp;#10;Origin: http://api.bob.com&amp;#10;Access-Control-Request-Method: PUT&amp;#10;Access-Control-Request-Headers: X-Custom-Header&amp;#10;Host: api.alice.com&amp;#10;Accept-Language: en-US&amp;#10;Connection: keep-alive&amp;#10;User-Agent: Mozilla/5.0...&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;预检请求：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;
+OPTIONS&lt; /cors HTTP/1.1
+&lt;b&gt;Origin&lt;/b&gt;: http://api.bob.com
+&lt;b&gt;Access-Control-Request-Method&lt;/b&gt;: PUT
+&lt;b&gt;Access-Control-Request-Headers&lt;/b&gt;: X-Custom-Header
+Host: api.alice.com
+Accept-Language: en-US
+Connection: keep-alive
+User-Agent: Mozilla/5.0...
+&lt;/code&gt;&lt;/pre&gt;
+
 &lt;p&gt;预检请求响应&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;// ERROR - &amp;#27809;&amp;#26377; CORS header, &amp;#36825;&amp;#26159;&amp;#19968;&amp;#20010;&amp;#26080;&amp;#25928;&amp;#35831;&amp;#27714;!&amp;#10;Content-Type: text/html; charset=utf-8&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
 &lt;p&gt;如果CORS请求发生错误，浏览器将触发onerror事件，并且会把错误信息输出到控制台：&lt;/p&gt;
 &lt;blockquote&gt;
@@ -236,7 +328,7 @@ xhr.withCredentials = true;
     
     <summary type="html">
     
-      &lt;h2 id=&quot;u5F15_u8A00&quot;&gt;&lt;a href=&quot;#u5F15_u8A00&quot; class=&quot;headerlink&quot; title=&quot;引言&quot;&gt;&lt;/a&gt;引言&lt;/h2&gt;&lt;p&gt;　　APIs are the threads that let you stitch together 
+      &lt;h2 id=&quot;u5F15_u8A00&quot;&gt;&lt;a href=&quot;#u5F15_u8A00&quot; class=&quot;headerlink&quot; title=&quot;引言&quot;&gt;&lt;/a&gt;引言&lt;/h2&gt;&lt;p&gt;　　API的出现增强了富web应用开发的体验。曾经想通过跨域请求api非常困难可以使用json-p这样的
     
     </summary>
     
@@ -254,7 +346,7 @@ xhr.withCredentials = true;
     <link href="http://emou.me/2016/02/03/beginning/"/>
     <id>http://emou.me/2016/02/03/beginning/</id>
     <published>2016-02-03T13:11:00.000Z</published>
-    <updated>2016-02-10T05:33:56.809Z</updated>
+    <updated>2016-02-27T02:16:31.252Z</updated>
     
     <content type="html">&lt;h4 id=&quot;The_beginning_is_the_most_important_part_of_the_work-__u2013_Plato&quot;&gt;&lt;a href=&quot;#The_beginning_is_the_most_important_part_of_the_work-__u2013_Plato&quot; class=&quot;headerlink&quot; title=&quot;The beginning is the most important part of the work. – Plato&quot;&gt;&lt;/a&gt;The beginning is the most important part of the work. – Plato&lt;/h4&gt;&lt;p&gt;&lt;img src=&quot;/images/05085938_15936.jpg&quot; alt=&quot;&quot;&gt;&lt;/p&gt;
 </content>
